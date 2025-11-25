@@ -11,12 +11,12 @@ import (
 func main() {
 	cfg, err := config.Load()
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 
 	app, err := app.New(cfg)
 	if err != nil {
-		log.Fatal(err)
+		log.Panic(err)
 	}
 
 	router := gin.Default()

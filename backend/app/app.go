@@ -27,7 +27,10 @@ func New(cfg *config.Config) (*App, error) {
 }
 
 func (a *App) Routes(router *gin.Engine) {
-	user := router.Group("/user")
+
+	api := router.Group("/api/v1")
+
+	user := api.Group("/user")
 	{
 		user.GET("/")
 		user.POST("/register")
