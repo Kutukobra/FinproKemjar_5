@@ -21,6 +21,7 @@ func New(cfg *config.Config) (*App, error) {
 
 	userRepository := repository.NewPGUserRepository(pgDatabase)
 	userService := service.NewUserService(userRepository, cfg.BcryptCost)
+
 	return &App{
 		userHandler: handler.NewUserHandler(userService),
 	}, nil

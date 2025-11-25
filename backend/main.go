@@ -11,18 +11,18 @@ import (
 func main() {
 	cfg, err := config.Load()
 	if err != nil {
-		log.Panic(err)
+		log.Fatal(err)
 	}
 
 	app, err := app.New(cfg)
 	if err != nil {
-		log.Panic(err)
+		log.Fatal(err)
 	}
 
 	router := gin.Default()
 	app.Routes(router)
 
-	router.Run(":" + cfg.AppPort)
+	router.Run(cfg.AppPort)
 
 	log.Println("App Running on Port :" + cfg.AppPort)
 }

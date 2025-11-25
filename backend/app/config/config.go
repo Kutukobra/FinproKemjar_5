@@ -1,6 +1,8 @@
 package config
 
 import (
+	"errors"
+	"log"
 	"os"
 	"strconv"
 
@@ -14,15 +16,28 @@ type Config struct {
 }
 
 func Load() (*Config, error) {
-	err := godotenv.Load()
-	if err != nil {
-		return nil, err
+	godotenv.Load()
+
+	appPort := os.Getenv("APP_PORT")
+	if appPort == "" {
+		appPort = "3000"
 	}
 
-	bcryptCost, _ := strconv.Atoi(os.Getenv("BCRYPT_COST"))
+	pgConnectionString := os.Getenv("PG_URI")
+	if pgConnectionString == "" {
+		return nil, errors.New("config: no postgresql connection string found")
+	}
+
+	bcryptCost, err := strconv.Atoi(os.Getenv("BCRYPT_COST"))
+	if err != nil {
+		bcryptCost = 12 // Default
+	}
+
+	log.Println("ENVS: " + appPort + pgConnectionString)
 
 	return &Config{
-		PostgresConnectionString: os.Getenv("PG_CONN_STRING"),
+		PostgresConnectionString: pgConnectionString,
 		BcryptCost:               bcryptCost,
+		AppPort:                  appPort,
 	}, nil
 }
