@@ -22,7 +22,6 @@ func NewPGUserRepository(driver *pgx.Conn) *PGUserRepository {
 }
 
 func rowToUser(row pgx.Row) (*model.User, error) {
-
 	var user model.User
 	err := row.Scan(&user.ID, &user.Username, &user.Email, &user.Password)
 	if err != nil {
