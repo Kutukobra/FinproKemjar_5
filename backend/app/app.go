@@ -6,7 +6,6 @@ import (
 	"github.com/Kutukobra/FinproKemjar_5/backend/app/handler"
 	"github.com/Kutukobra/FinproKemjar_5/backend/app/repository"
 	"github.com/Kutukobra/FinproKemjar_5/backend/app/service"
-	"github.com/gin-gonic/gin"
 )
 
 type App struct {
@@ -25,17 +24,4 @@ func New(cfg *config.Config) (*App, error) {
 	return &App{
 		userHandler: handler.NewUserHandler(userService),
 	}, nil
-}
-
-func (a *App) Routes(router *gin.Engine) {
-
-	api := router.Group("/api/v1")
-
-	user := api.Group("/user")
-	{
-		user.GET("/")
-		user.POST("/register")
-		user.POST("/login")
-		user.PUT("/change-password")
-	}
 }

@@ -2,9 +2,9 @@ package repository
 
 import (
 	"context"
-	"database/sql"
 
 	"github.com/Kutukobra/FinproKemjar_5/backend/app/model"
+	"github.com/jackc/pgx/v5"
 )
 
 type UserRepository interface {
@@ -14,43 +14,47 @@ type UserRepository interface {
 }
 
 type PGUserRepository struct {
-	driver *sql.DB
+	driver *pgx.Conn
 }
 
-func NewPGUserRepository(driver *sql.DB) *PGUserRepository {
+func NewPGUserRepository(driver *pgx.Conn) *PGUserRepository {
 	return &PGUserRepository{driver: driver}
 }
 
-func rowsToUser(rows *sql.Rows) (*model.User, error) {
+func rowsToUser(rows pgx.Rows) (*model.User, error) {
 	var user model.User
 	err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.Password)
 	if err != nil {
 		return nil, err
 	}
+
+	rows.Close()
 	return &user, nil
 }
 
 func (r *PGUserRepository) GetUser(ctx context.Context, username string) (*model.User, error) {
-	query := "SELECT * FROM Users WHERE Username = ?;"
-	rows, err := r.driver.QueryContext(ctx, query, username)
+	query := "SELECT * FROM Users WHERE Username = $1;"
+	rows, err := r.driver.Query(ctx, query, username)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+
+	rows.Next()
 
 	return rowsToUser(rows)
 }
 
 func (r *PGUserRepository) RegisterUser(ctx context.Context, username string, email string, password string) (*model.User, error) {
 	query := `
-	INSERT INTO Users (Username, Email, Password) VALUES (?, ?, ?) 
+	INSERT INTO Users (Username, Email, Password) VALUES ($1, $2, $3) 
 		RETURNING (ID, Username, Email, Password);
 	`
-	rows, err := r.driver.QueryContext(ctx, query, username, email, password)
+	rows, err := r.driver.Query(ctx, query, username, email, password)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
+
+	rows.Next()
 
 	return rowsToUser(rows)
 }
@@ -58,14 +62,13 @@ func (r *PGUserRepository) RegisterUser(ctx context.Context, username string, em
 func (r *PGUserRepository) ChangeUserPassword(ctx context.Context, username string, newPassword string) (*model.User, error) {
 	query := `
 		UPDATE Users 
-		SET Password = ?
-		WHERE Username = ? RETURNING (ID, Username, Email, Password);
+		SET Password = $2
+		WHERE Username = $1 RETURNING (ID, Username, Email, Password);
 	`
-	rows, err := r.driver.QueryContext(ctx, query, newPassword, username)
+	rows, err := r.driver.Query(ctx, query, username, newPassword)
 	if err != nil {
 		return nil, err
 	}
-	defer rows.Close()
 
 	return rowsToUser(rows)
 }

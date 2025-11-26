@@ -2,7 +2,6 @@ package config
 
 import (
 	"errors"
-	"log"
 	"os"
 	"strconv"
 
@@ -20,10 +19,10 @@ func Load() (*Config, error) {
 
 	appPort := os.Getenv("APP_PORT")
 	if appPort == "" {
-		appPort = "3000"
+		appPort = ":8080"
 	}
 
-	pgConnectionString := os.Getenv("PG_URI")
+	pgConnectionString := os.Getenv("PG_STRING")
 	if pgConnectionString == "" {
 		return nil, errors.New("config: no postgresql connection string found")
 	}
@@ -32,8 +31,6 @@ func Load() (*Config, error) {
 	if err != nil {
 		bcryptCost = 12 // Default
 	}
-
-	log.Println("ENVS: " + appPort + pgConnectionString)
 
 	return &Config{
 		PostgresConnectionString: pgConnectionString,

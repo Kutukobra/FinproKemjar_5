@@ -22,7 +22,10 @@ func main() {
 	router := gin.Default()
 	app.Routes(router)
 
-	router.Run(cfg.AppPort)
+	err = router.Run(cfg.AppPort)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	log.Println("App Running on Port :" + cfg.AppPort)
 }

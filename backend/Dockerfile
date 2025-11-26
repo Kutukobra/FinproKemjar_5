@@ -8,8 +8,6 @@ RUN go mod download
 
 RUN go build main.go
 
-ENV AppPort=8888
-
-EXPOSE 8888
+EXPOSE 8080
 
 ENTRYPOINT [ "./main" ]

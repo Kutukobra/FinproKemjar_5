@@ -2,13 +2,16 @@ services:
   backend:
     build: ./backend
     environment:
-      - PG_URI=postgresql://postgres:postgres@db:5432/kemjar
-      - APP_PORT=8888
+      - PG_STRING=postgresql://postgres:postgres@db:5432/kemjar
+      - APP_PORT=:8080
     ports:
-      - "3000:8888"
+      - "3000:8080"
     depends_on:
       db:
         condition: service_healthy
+    watch:
+      - action: rebuild
+      - path: ./backend
   
   db:
     image: postgres:15.15-trixie
@@ -17,6 +20,8 @@ services:
       - POSTGRES_PASSWORD=postgres
       - POSTGRES_DB=kemjar
       - PGUSER=postgres
+    ports:
+      - "5432:5432"
     volumes:
       - ./pgdata:/var/lib/postgresql/data
     healthcheck:

@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"log"
 	"net/http"
 
 	"github.com/Kutukobra/FinproKemjar_5/backend/app/service"
@@ -21,7 +22,17 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 
 	username := c.Query("username")
 
+	if username == "" {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"error": "invalid username",
+		})
+		return
+	}
+
 	userData, err := h.serv.GetUser(ctx, username)
+
+	log.Println("Created: " + userData.Username)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"error": err,

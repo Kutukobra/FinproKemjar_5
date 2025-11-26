@@ -1,13 +1,15 @@
 package database
 
 import (
-	"database/sql"
+	"context"
+
+	"github.com/jackc/pgx/v5"
 
 	_ "github.com/lib/pq"
 )
 
-func NewPostgresDatabase(connectionString string) (*sql.DB, error) {
-	driver, err := sql.Open("postgres", connectionString)
+func NewPostgresDatabase(connectionString string) (*pgx.Conn, error) {
+	driver, err := pgx.Connect(context.Background(), connectionString)
 	if err != nil {
 		return nil, err
 	}
