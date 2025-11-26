@@ -94,6 +94,7 @@ func (h *UserHandler) LoginUser(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"data": userData,
 		})
+		return
 	}
 
 	if err == bcrypt.ErrMismatchedHashAndPassword {
