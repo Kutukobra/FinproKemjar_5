@@ -19,7 +19,7 @@ func Load() (*Config, error) {
 
 	appPort := os.Getenv("PORT")
 	if appPort == "" {
-		appPort = ":8080"
+		appPort = "8080"
 	}
 
 	pgConnectionString := os.Getenv("PG_STRING")

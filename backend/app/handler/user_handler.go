@@ -6,6 +6,7 @@ import (
 
 	"github.com/Kutukobra/FinproKemjar_5/backend/app/service"
 	"github.com/gin-gonic/gin"
+	"github.com/lib/pq"
 	"golang.org/x/crypto/bcrypt"
 )
 
@@ -50,6 +51,15 @@ func (h *UserHandler) RegisterUser(c *gin.Context) {
 	username, email, password := c.Query("username"), c.Query("email"), c.Query("password")
 
 	userData, err := h.serv.RegisterUser(ctx, username, email, password)
+
+	if pqErr, ok := err.(*pq.Error); ok {
+		if pqErr.Code == "23505" {
+			c.Error(pqErr)
+			c.JSON(http.StatusConflict, gin.H{
+				"error": "Username or Email already taken.",
+			})
+		}
+	}
 
 	if err != nil {
 		c.Error(err)
