@@ -17,7 +17,7 @@ type Config struct {
 func Load() (*Config, error) {
 	godotenv.Load()
 
-	appPort := os.Getenv("APP_PORT")
+	appPort := os.Getenv("PORT")
 	if appPort == "" {
 		appPort = ":8080"
 	}

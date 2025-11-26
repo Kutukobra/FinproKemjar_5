@@ -23,6 +23,7 @@ func NewPGUserRepository(driver *pgx.Conn) *PGUserRepository {
 
 func rowsToUser(rows pgx.Rows) (*model.User, error) {
 	var user model.User
+	rows.Next()
 	err := rows.Scan(&user.ID, &user.Username, &user.Email, &user.Password)
 	if err != nil {
 		return nil, err
@@ -34,12 +35,11 @@ func rowsToUser(rows pgx.Rows) (*model.User, error) {
 
 func (r *PGUserRepository) GetUser(ctx context.Context, username string) (*model.User, error) {
 	query := "SELECT * FROM Users WHERE Username = $1;"
+
 	rows, err := r.driver.Query(ctx, query, username)
 	if err != nil {
 		return nil, err
 	}
-
-	rows.Next()
 
 	return rowsToUser(rows)
 }
@@ -47,14 +47,12 @@ func (r *PGUserRepository) GetUser(ctx context.Context, username string) (*model
 func (r *PGUserRepository) RegisterUser(ctx context.Context, username string, email string, password string) (*model.User, error) {
 	query := `
 	INSERT INTO Users (Username, Email, Password) VALUES ($1, $2, $3) 
-		RETURNING (ID, Username, Email, Password);
+		RETURNING ID, Username, Email, Password;
 	`
 	rows, err := r.driver.Query(ctx, query, username, email, password)
 	if err != nil {
 		return nil, err
 	}
-
-	rows.Next()
 
 	return rowsToUser(rows)
 }
@@ -63,7 +61,7 @@ func (r *PGUserRepository) ChangeUserPassword(ctx context.Context, username stri
 	query := `
 		UPDATE Users 
 		SET Password = $2
-		WHERE Username = $1 RETURNING (ID, Username, Email, Password);
+		WHERE Username = $1 RETURNING ID, Username, Email, Password;
 	`
 	rows, err := r.driver.Query(ctx, query, username, newPassword)
 	if err != nil {

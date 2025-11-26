@@ -1,0 +1,38 @@
+services:
+  backend:
+    build: ./backend
+    environment:
+      - PG_STRING=postgresql://postgres:postgres@db:5432/kemjar
+      - APP_PORT=8080
+      - GIN_MODE=release
+    ports:
+      - "3000:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    develop:
+      watch:
+        - action: rebuild
+          path: ./backend
+  
+  db:
+    image: postgres:15.15
+    user: postgres
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=kemjar
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "kemjar"]
+      interval: 30s
+      timeout: 60s
+      retries: 5
+      start_period: 20s
+
+volumes:
+  pgdata:

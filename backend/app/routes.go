@@ -1,6 +1,8 @@
 package app
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/gin-gonic/gin"
+)
 
 func (a *App) Routes(router *gin.Engine) {
 
@@ -8,7 +10,7 @@ func (a *App) Routes(router *gin.Engine) {
 
 	user := api.Group("/user")
 	{
-		user.GET("/", a.userHandler.GetUser)
+		user.GET("/:username", a.userHandler.GetUser)
 		user.POST("/register", a.userHandler.RegisterUser)
 		user.POST("/login", a.userHandler.LoginUser)
 		user.PUT("/change-password", a.userHandler.ChangeUserPassword)
