@@ -10,6 +10,7 @@ import (
 
 type App struct {
 	userHandler *handler.UserHandler
+	pageHandler *handler.PageHandler
 }
 
 func New(cfg *config.Config) (*App, error) {
@@ -23,5 +24,6 @@ func New(cfg *config.Config) (*App, error) {
 
 	return &App{
 		userHandler: handler.NewUserHandler(userService),
+		pageHandler: handler.NewPageHandler(userService),
 	}, nil
 }

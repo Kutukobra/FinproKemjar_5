@@ -111,10 +111,44 @@ func (h *UserHandler) LoginUser(c *gin.Context) {
 	})
 }
 
+func (h *UserHandler) LoginUserForm(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	username := c.Query("username")
+	password := c.Query("password")
+
+	_, err := h.serv.LoginUser(ctx, username, password)
+
+	if err == nil {
+		c.Header("HX-Redirect", "/dashboard?username="+username)
+		c.Status(http.StatusOK)
+		return
+	}
+
+	// user not found
+	if err == pgx.ErrNoRows {
+		c.HTML(http.StatusUnauthorized, "", gin.H{})
+		c.Writer.WriteString(`<div class="error-message">Wrong username or password</div>`)
+		return
+	}
+
+	// wrong password
+	if err == bcrypt.ErrMismatchedHashAndPassword {
+		c.HTML(http.StatusUnauthorized, "", gin.H{})
+		c.Writer.WriteString(`<div class="error-message">Wrong username or password</div>`)
+		return
+	}
+
+	// server error
+	c.HTML(http.StatusInternalServerError, "", gin.H{})
+	c.Writer.WriteString(`<div class="error-message">Server error occurred</div>`)
+}
+
 func (h *UserHandler) ChangeUserPassword(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	username, password := c.Query("username"), c.Query("password")
+	username := c.Query("username")
+	password := c.Query("password")
 
 	if username == "" || password == "" {
 		c.Error(errors.New("empty username or password"))
@@ -137,4 +171,37 @@ func (h *UserHandler) ChangeUserPassword(c *gin.Context) {
 	c.JSON(http.StatusInternalServerError, gin.H{
 		"error": "Internal server error.",
 	})
+}
+
+func (h *UserHandler) RegisterUserForm(c *gin.Context) {
+	ctx := c.Request.Context()
+
+	username := c.Query("username")
+	email := c.Query("email")
+	password := c.Query("password")
+
+	if username == "" || email == "" || password == "" {
+		c.HTML(http.StatusBadRequest, "", gin.H{})
+		c.Writer.WriteString(`<div class="error-message">All fields are required</div>`)
+		return
+	}
+
+	_, err := h.serv.RegisterUser(ctx, username, email, password)
+
+	if err == nil {
+		c.Header("HX-Redirect", "/login")
+		c.Status(http.StatusOK)
+		return
+	}
+
+	// duplicate username/email
+	if pqErr, ok := err.(*pgconn.PgError); ok && pqErr.Code == "23505" {
+		c.HTML(http.StatusConflict, "", gin.H{})
+		c.Writer.WriteString(`<div class="error-message">Username or Email already taken</div>`)
+		return
+	}
+
+	// server error
+	c.HTML(http.StatusInternalServerError, "", gin.H{})
+	c.Writer.WriteString(`<div class="error-message">Server error occurred</div>`)
 }

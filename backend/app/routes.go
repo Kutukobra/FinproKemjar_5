@@ -5,14 +5,31 @@ import (
 )
 
 func (a *App) Routes(router *gin.Engine) {
+	// Serve static files
+	router.Static("/static", "./app/static")
 
+	// Page routes
+	router.GET("/", a.pageHandler.DashboardPage)
+	router.GET("/login", a.pageHandler.LoginPage)
+	router.GET("/register", a.pageHandler.RegisterPage)
+	router.GET("/dashboard", a.pageHandler.DashboardPage)
+	router.GET("/change-password", a.pageHandler.ChangePasswordPage)
+	router.GET("/profile", a.pageHandler.ProfilePage)
+
+	// API routes (JSON responses)
 	api := router.Group("/api")
-
-	user := api.Group("/user")
 	{
-		user.GET("/:username", a.userHandler.GetUser)
-		user.POST("/register", a.userHandler.RegisterUser)
-		user.POST("/login", a.userHandler.LoginUser)
-		user.PUT("/change-password", a.userHandler.ChangeUserPassword)
+		user := api.Group("/user")
+		{
+			user.GET("/:username", a.userHandler.GetUser)
+			user.POST("/register", a.userHandler.RegisterUser)
+			user.POST("/login", a.userHandler.LoginUserForm)
+			user.PUT("/change-password", a.userHandler.ChangeUserPassword)
+		}
 	}
+
+	// Form submission routes (redirect after success)
+	router.POST("/login", a.userHandler.LoginUserForm)
+	router.POST("/register", a.userHandler.RegisterUserForm)
+
 }

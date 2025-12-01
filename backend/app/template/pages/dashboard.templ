@@ -1,0 +1,25 @@
+package pages
+
+import "github.com/Kutukobra/FinproKemjar_5/backend/app/template"
+
+templ Dashboard(username string) {
+    @template.Layout("Dashboard") {
+        <div class="card">
+            <h1>Welcome, { username }!</h1>
+            
+            <div class="dashboard-content">
+                <p>You are now logged in to your account.</p>
+                
+                <div class="dashboard-actions">
+                    <a href={ templ.SafeURL("/change-password?username=" + username) } class="btn-primary">
+                        🔒 Change Password
+                    </a>
+                    
+                    <a href={ templ.SafeURL("/profile?username=" + username) } class="btn-secondary">
+                        👤 View Profile
+                    </a>
+                </div>
+            </div>
+        </div>
+    }
+}

@@ -1,0 +1,33 @@
+package pages
+
+import "github.com/Kutukobra/FinproKemjar_5/backend/app/template"
+
+templ Profile(username string) {
+    @template.Layout("Profile") {
+        <div class="card">
+            <h1>User Profile</h1>
+            
+            <div class="profile-info">
+                <h3>Account Information</h3>
+                <button 
+                    hx-get={ "/api/user/" + username }
+                    hx-target="#user-data"
+                    hx-swap="innerHTML"
+                    class="btn-primary">
+                    Load Profile Data
+                </button>
+                <div id="user-data" class="data-display"></div>
+            </div>
+
+            <div class="profile-actions">
+                <a href="/change-password" class="btn-secondary">
+                    🔒 Change Password
+                </a>
+                
+                <a href="/dashboard" class="btn-secondary">
+                    🏠 Back to Dashboard
+                </a>
+            </div>
+        </div>
+    }
+}
