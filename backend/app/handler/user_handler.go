@@ -140,17 +140,34 @@ func (h *UserHandler) ChangeUserPassword(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	username := c.PostForm("username")
-	password := c.PostForm("password")
+	currentPassword := c.PostForm("current_password")
+	newPassword := c.PostForm("password")
 
-	if username == "" || password == "" {
-		c.Error(errors.New("empty username or password"))
+	if username == "" || currentPassword == "" || newPassword == "" {
+		c.Error(errors.New("empty username, current password or new password"))
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Username or password cannot be empty.",
+			"error": "Username, current password and new password cannot be empty.",
 		})
 		return
 	}
 
-	_, err := h.serv.ChangeUserPassword(ctx, username, password)
+	_, err := h.serv.LoginUser(ctx, username, currentPassword)
+	if err != nil {
+		if err == bcrypt.ErrMismatchedHashAndPassword || err == pgx.ErrNoRows {
+			c.Error(errors.New("incorrect current password"))
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"error": "Current password is incorrect.",
+			})
+			return
+		}
+		c.Error(err)
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"error": "Internal server error.",
+		})
+		return
+	}
+
+	_, err = h.serv.ChangeUserPassword(ctx, username, newPassword)
 
 	if err == nil {
 		c.Header("HX-Redirect", "/dashboard?username="+username)
