@@ -12,11 +12,11 @@ templ Dashboard(username string) {
                 
                 <div class="dashboard-actions">
                     <a href={ templ.SafeURL("/change-password?username=" + username) } class="btn-primary">
-                        🔒 Change Password
+                        Change Password
                     </a>
                     
                     <a href={ templ.SafeURL("/profile?username=" + username) } class="btn-secondary">
-                        👤 View Profile
+                        View Profile
                     </a>
                 </div>
             </div>
