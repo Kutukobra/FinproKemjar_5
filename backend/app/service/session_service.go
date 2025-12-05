@@ -1,6 +1,7 @@
 package service
 
 import (
+	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -33,5 +34,6 @@ func Validatetoken(tokenString string) (*Claims, error) {
 	if err != nil || !token.Valid {
 		return nil, err
 	}
+	log.Println(claims.Username)
 	return claims, nil
 }

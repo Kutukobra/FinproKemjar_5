@@ -26,6 +26,16 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	username := c.Param("username")
+
+	authUser := c.GetString("authUser")
+
+	log.Println(username + " - " + authUser)
+
+	if authUser != username {
+		c.Header("HX-Redirect", "/login")
+		return
+	}
+
 	if username == "" {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid username."})
 		return
