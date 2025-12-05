@@ -1,6 +1,7 @@
 package app
 
 import (
+	"github.com/Kutukobra/FinproKemjar_5/backend/app/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -21,10 +22,10 @@ func (a *App) Routes(router *gin.Engine) {
 	{
 		user := api.Group("/user")
 		{
-			user.GET("/:username", a.userHandler.GetUser)
+			user.GET("/:username", middleware.SessionAuth(), a.userHandler.GetUser)
 			user.POST("/register", a.userHandler.RegisterUser)
 			user.POST("/login", a.userHandler.LoginUser)
-			user.PUT("/change-password", a.userHandler.ChangeUserPassword)
+			user.PUT("/change-password", middleware.SessionAuth(), a.userHandler.ChangeUserPassword)
 		}
 	}
 
