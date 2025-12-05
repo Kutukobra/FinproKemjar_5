@@ -10,8 +10,7 @@ templ Login() {
                 hx-post="/login"
                 hx-trigger="submit"
                 hx-target="#response"
-                hx-swap="innerHTML"
-                onsubmit="event.preventDefault(); htmx.ajax('POST', '/login?username=' + encodeURIComponent(document.getElementById('username').value) + '&password=' + encodeURIComponent(document.getElementById('password').value), {target:'#response', swap:'innerHTML'})">
+                hx-swap="innerHTML">
                 
                 <div class="form-group">
                     <label for="username">Username</label>

@@ -43,7 +43,7 @@ func Login() templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"card\"><h1>Login</h1><form hx-post=\"/login\" hx-vals='js:{username: document.getElementById(\"username\").value, password: document.getElementById(\"password\").value}' hx-trigger=\"submit\" hx-target=\"#response\" hx-swap=\"innerHTML\"><div class=\"form-group\"><label for=\"username\">Username</label> <input type=\"text\" id=\"username\" name=\"username\" required></div><div class=\"form-group\"><label for=\"password\">Password</label> <input type=\"password\" id=\"password\" name=\"password\" required></div><button type=\"submit\" class=\"btn-primary\">Login</button><div id=\"response\" class=\"response-area\"></div></form><p style=\"margin-top: 1rem; text-align: center;\">Don't have an account? <a href=\"/register\">Register here</a></p></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"card\"><h1>Login</h1><form hx-post=\"/login\" hx-trigger=\"submit\" hx-target=\"#response\" hx-swap=\"innerHTML\"><div class=\"form-group\"><label for=\"username\">Username</label> <input type=\"text\" id=\"username\" name=\"username\" required></div><div class=\"form-group\"><label for=\"password\">Password</label> <input type=\"password\" id=\"password\" name=\"password\" required></div><button type=\"submit\" class=\"btn-primary\">Login</button><div id=\"response\" class=\"response-area\"></div></form><p style=\"margin-top: 1rem; text-align: center;\">Don't have an account? <a href=\"/register\">Register here</a></p></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

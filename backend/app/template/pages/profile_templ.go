@@ -43,20 +43,20 @@ func Profile(username string) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"card\"><h1>User Profile</h1><div class=\"profile-info\"><h3>Account Information</h3><button hx-get=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"card\"><h1>User Profile</h1><div class=\"profile-info\"><h3>Account Information</h3><div id=\"user-data\" hx-get=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs("/api/user/" + username)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/template/pages/profile.templ`, Line: 13, Col: 52}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `app/template/pages/profile.templ`, Line: 15, Col: 52}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" hx-target=\"#user-data\" hx-swap=\"innerHTML\" class=\"btn-primary\">Load Profile Data</button><div id=\"user-data\" class=\"data-display\"></div></div><div class=\"profile-actions\"><a href=\"/change-password\" class=\"btn-secondary\">🔒 Change Password</a> <a href=\"/dashboard\" class=\"btn-secondary\">🏠 Back to Dashboard</a></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" hx-trigger=\"load\" hx-swap=\"innerHTML\" class=\"data-display\"></div></div><div class=\"profile-actions\"><a href=\"/change-password\" class=\"btn-secondary\">🔒 Change Password</a> <a href=\"/dashboard\" class=\"btn-secondary\">🏠 Back to Dashboard</a></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

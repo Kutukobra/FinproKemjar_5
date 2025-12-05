@@ -6,17 +6,17 @@ templ Profile(username string) {
     @template.Layout("Profile") {
         <div class="card">
             <h1>User Profile</h1>
-            
+
             <div class="profile-info">
                 <h3>Account Information</h3>
-                <button 
+
+                <div 
+                    id="user-data"
                     hx-get={ "/api/user/" + username }
-                    hx-target="#user-data"
+                    hx-trigger="load"
                     hx-swap="innerHTML"
-                    class="btn-primary">
-                    Load Profile Data
-                </button>
-                <div id="user-data" class="data-display"></div>
+                    class="data-display"
+                ></div>
             </div>
 
             <div class="profile-actions">

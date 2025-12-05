@@ -2,6 +2,8 @@ package handler
 
 import (
 	"errors"
+	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/Kutukobra/FinproKemjar_5/backend/app/service"
@@ -23,36 +25,30 @@ func (h *UserHandler) GetUser(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	username := c.Param("username")
-
 	if username == "" {
-		c.Error(errors.New("invalid username"))
-		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "Invalid username.",
-		})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid username."})
 		return
 	}
 
 	userData, err := h.serv.GetUser(ctx, username)
-
-	if err == nil {
-		c.JSON(http.StatusOK, gin.H{
-			"data": userData,
-		})
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			c.JSON(http.StatusNotFound, gin.H{"error": "User not found."})
+			return
+		}
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Internal server error."})
 		return
 	}
 
-	if err == pgx.ErrNoRows {
-		c.Error(errors.New("user not found"))
-		c.JSON(http.StatusNotFound, gin.H{
-			"error": "User not found.",
-		})
-		return
-	}
+	html := fmt.Sprintf(`
+		<div class="data-display">
+			<p><strong>ID:</strong> %s</p>
+			<p><strong>Username:</strong> %s</p>
+			<p><strong>Email:</strong> %s</p>
+		</div>
+	`, userData.ID, userData.Username, userData.Email)
 
-	c.Error(err)
-	c.JSON(http.StatusInternalServerError, gin.H{
-		"error": "Internal server error.",
-	})
+	c.Data(http.StatusOK, "text/html; charset=utf-8", []byte(html))
 }
 
 func (h *UserHandler) RegisterUser(c *gin.Context) {
@@ -114,8 +110,8 @@ func (h *UserHandler) LoginUser(c *gin.Context) {
 func (h *UserHandler) LoginUserForm(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	username := c.Query("username")
-	password := c.Query("password")
+	username := c.PostForm("username")
+	password := c.PostForm("password")
 
 	_, err := h.serv.LoginUser(ctx, username, password)
 
@@ -127,28 +123,24 @@ func (h *UserHandler) LoginUserForm(c *gin.Context) {
 
 	// user not found
 	if err == pgx.ErrNoRows {
-		c.HTML(http.StatusUnauthorized, "", gin.H{})
 		c.Writer.WriteString(`<div class="error-message">Wrong username or password</div>`)
 		return
 	}
 
 	// wrong password
 	if err == bcrypt.ErrMismatchedHashAndPassword {
-		c.HTML(http.StatusUnauthorized, "", gin.H{})
 		c.Writer.WriteString(`<div class="error-message">Wrong username or password</div>`)
 		return
 	}
 
-	// server error
-	c.HTML(http.StatusInternalServerError, "", gin.H{})
 	c.Writer.WriteString(`<div class="error-message">Server error occurred</div>`)
 }
 
 func (h *UserHandler) ChangeUserPassword(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	username := c.Query("username")
-	password := c.Query("password")
+	username := c.PostForm("username")
+	password := c.PostForm("password")
 
 	if username == "" || password == "" {
 		c.Error(errors.New("empty username or password"))
@@ -158,12 +150,10 @@ func (h *UserHandler) ChangeUserPassword(c *gin.Context) {
 		return
 	}
 
-	userData, err := h.serv.ChangeUserPassword(ctx, username, password)
+	_, err := h.serv.ChangeUserPassword(ctx, username, password)
 
 	if err == nil {
-		c.JSON(http.StatusOK, gin.H{
-			"data": userData,
-		})
+		c.Header("HX-Redirect", "/dashboard?username="+username)
 		return
 	}
 
@@ -176,12 +166,13 @@ func (h *UserHandler) ChangeUserPassword(c *gin.Context) {
 func (h *UserHandler) RegisterUserForm(c *gin.Context) {
 	ctx := c.Request.Context()
 
-	username := c.Query("username")
-	email := c.Query("email")
-	password := c.Query("password")
+	username := c.PostForm("username")
+	email := c.PostForm("email")
+	password := c.PostForm("password")
+
+	log.Println(username + email + password)
 
 	if username == "" || email == "" || password == "" {
-		c.HTML(http.StatusBadRequest, "", gin.H{})
 		c.Writer.WriteString(`<div class="error-message">All fields are required</div>`)
 		return
 	}
@@ -196,12 +187,9 @@ func (h *UserHandler) RegisterUserForm(c *gin.Context) {
 
 	// duplicate username/email
 	if pqErr, ok := err.(*pgconn.PgError); ok && pqErr.Code == "23505" {
-		c.HTML(http.StatusConflict, "", gin.H{})
 		c.Writer.WriteString(`<div class="error-message">Username or Email already taken</div>`)
 		return
 	}
 
-	// server error
-	c.HTML(http.StatusInternalServerError, "", gin.H{})
 	c.Writer.WriteString(`<div class="error-message">Server error occurred</div>`)
 }

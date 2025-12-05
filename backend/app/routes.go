@@ -23,7 +23,7 @@ func (a *App) Routes(router *gin.Engine) {
 		{
 			user.GET("/:username", a.userHandler.GetUser)
 			user.POST("/register", a.userHandler.RegisterUser)
-			user.POST("/login", a.userHandler.LoginUserForm)
+			user.POST("/login", a.userHandler.LoginUser)
 			user.PUT("/change-password", a.userHandler.ChangeUserPassword)
 		}
 	}
