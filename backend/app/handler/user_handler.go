@@ -88,12 +88,6 @@ func (h *UserHandler) LoginUser(c *gin.Context) {
 	_, err := h.serv.LoginUser(ctx, username, password)
 
 	if err == nil {
-		tokenString, err := service.GenerateToken(username)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "Could not generate token"})
-		}
-
-		c.SetCookie("session_token", tokenString, int(1*time.Hour), "/", "", false, true)
 		c.JSON(http.StatusOK, gin.H{
 			"message": "Login successful.",
 		})
@@ -123,8 +117,19 @@ func (h *UserHandler) LoginUserForm(c *gin.Context) {
 	_, err := h.serv.LoginUser(ctx, username, password)
 
 	if err == nil {
+		// generate token
+		tokenString, err := service.GenerateToken(username)
+		if err != nil {
+			c.Writer.WriteString(`<div class="error-message">Server error generating token</div>`)
+			return
+		}
+
+		// set cookie
+		c.SetCookie("session_token", tokenString, int(1*time.Hour), "/", "", false, true)
+
+		// redirect via HTMX
 		c.Header("HX-Redirect", "/dashboard?username="+username)
-		c.Status(http.StatusOK)
+		c.Status(200)
 		return
 	}
 

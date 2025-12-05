@@ -15,14 +15,14 @@ func (a *App) Routes(router *gin.Engine) {
 	router.GET("/register", a.pageHandler.RegisterPage)
 	router.GET("/dashboard", a.pageHandler.DashboardPage)
 	router.GET("/change-password", a.pageHandler.ChangePasswordPage)
-	router.GET("/profile", a.pageHandler.ProfilePage)
+	router.GET("/profile", middleware.SessionAuth(), a.pageHandler.ProfilePage)
 
 	// API routes (JSON responses)
 	api := router.Group("/api")
 	{
 		user := api.Group("/user")
 		{
-			user.GET("/:username", middleware.SessionAuth(), a.userHandler.GetUser)
+			user.GET("/:username", a.userHandler.GetUser)
 			user.POST("/register", a.userHandler.RegisterUser)
 			user.POST("/login", a.userHandler.LoginUser)
 			user.PUT("/change-password", middleware.SessionAuth(), a.userHandler.ChangeUserPassword)
